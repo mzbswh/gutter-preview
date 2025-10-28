@@ -5,7 +5,7 @@
   "author": "Tamas Kiss",
   "publisher": "kisstkondoros",
   "license": "MIT",
-  "version": "0.32.2",
+  "version": "0.32.3",
   "displayName": "Image preview",
   "icon": "images/logo.png",
   "engines": {
@@ -93,6 +93,12 @@
           "scope": "resource",
           "markdownDescription": "Sometimes image URLs without extensions (such as `https://example.com/pic/640?fmt=jpeg`) are not detected. You can now specify regular expressions to detect these URLs. configured values (such as `/^http(s)*://example.com/pic/i`) will be parsed using [regex-parser](https://github.com/IonicaBizau/regex-parser.js) and ignored if they are illegal regular expression strings.",
           "type": "array"
+        },
+        "gutterpreview.enableAutoExtensionName": {
+          "default": true,
+          "scope": "resource",
+          "description": "当路径没有文件扩展名时自动尝试可接受的扩展名（仅限本地路径）",
+          "type": "boolean"
         }
       }
     }
