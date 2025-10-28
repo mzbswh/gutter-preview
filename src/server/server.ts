@@ -108,6 +108,8 @@ async function collectEntries(
             } catch {} // Illegal regular expression strings are ignored.
         })
         .filter((p: RegExp | undefined) => !!p);
+    
+    const enableAutoExtensionName = configuration.enableAutoExtensionName !== false; // 默认为 true
 
     const lines = document.getText().split(/\r\n|\r|\n/);
     let relativeImageDir = '';
@@ -147,7 +149,7 @@ async function collectEntries(
                     let absoluteUrls = absoluteUrlMappers
                         .map((mapper) => {
                             try {
-                                return mapper.map(request.fileName, urlMatch.url, { relativeImageDir });
+                                return mapper.map(request.fileName, urlMatch.url, { relativeImageDir, enableAutoExtensionName });
                             } catch (e) {}
                         })
                         .filter((item) => nonNullOrEmpty(item) && nonHttpOnly(item));

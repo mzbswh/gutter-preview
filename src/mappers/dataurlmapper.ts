@@ -1,7 +1,7 @@
 import { AbsoluteUrlMapper } from './mapper';
 
 export const dataUrlMapper: AbsoluteUrlMapper = {
-    map(fileName: string, imagePath: string) {
+    map(fileName: string, imagePath: string, additionalMetadata?: { relativeImageDir?: string; enableAutoExtensionName?: boolean }) {
         let absoluteImagePath: string;
         if (imagePath.indexOf('data:image') === 0) {
             absoluteImagePath = imagePath;

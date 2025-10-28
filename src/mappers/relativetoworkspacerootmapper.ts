@@ -3,6 +3,8 @@ import * as fs from 'fs';
 
 import { AbsoluteUrlMapper } from './mapper';
 import { ImageCache } from '../util/imagecache';
+import { tryFindFileWithExtension } from '../util/fileutil';
+import { acceptedExtensions } from '../util/acceptedExtensions';
 
 class RelativeToWorkspaceRootFileUrlMapper implements AbsoluteUrlMapper {
     private additionalSourceFolders: string[] = [];
@@ -10,7 +12,7 @@ class RelativeToWorkspaceRootFileUrlMapper implements AbsoluteUrlMapper {
     private paths: { [alias: string]: string | string[] };
     private aliases: string[];
 
-    map(fileName: string, imagePath: string) {
+    map(fileName: string, imagePath: string, additionalMetadata?: { relativeImageDir?: string; enableAutoExtensionName?: boolean }) {
         let absoluteImagePath: string;
 
         if (this.workspaceFolder) {
@@ -45,7 +47,15 @@ class RelativeToWorkspaceRootFileUrlMapper implements AbsoluteUrlMapper {
                     let testImagePath = path.join(rootPath, testPath);
                     if (ImageCache.has(testImagePath) || fs.existsSync(testImagePath)) {
                         absoluteImagePath = testImagePath;
-                    } else if (this.additionalSourceFolders.length > 0) {
+                    } else if (additionalMetadata?.enableAutoExtensionName) {
+                        // 如果文件不存在且启用了自动扩展名，尝试添加扩展名
+                        const pathWithExtension = tryFindFileWithExtension(testImagePath, acceptedExtensions);
+                        if (pathWithExtension) {
+                            absoluteImagePath = pathWithExtension;
+                        }
+                    }
+                    
+                    if (!absoluteImagePath && this.additionalSourceFolders.length > 0) {
                         for (let i = 0; i < this.additionalSourceFolders.length; i++) {
                             const additionalSourceFolder = this.additionalSourceFolders[i];
                             let testImagePath;
@@ -57,8 +67,19 @@ class RelativeToWorkspaceRootFileUrlMapper implements AbsoluteUrlMapper {
                             if (ImageCache.has(testImagePath) || fs.existsSync(testImagePath)) {
                                 absoluteImagePath = testImagePath;
                                 break;
+                            } else if (additionalMetadata?.enableAutoExtensionName) {
+                                // 如果文件不存在且启用了自动扩展名，尝试添加扩展名
+                                const pathWithExtension = tryFindFileWithExtension(testImagePath, acceptedExtensions);
+                                if (pathWithExtension) {
+                                    absoluteImagePath = pathWithExtension;
+                                    break;
+                                }
                             }
                         }
+                    }
+                    
+                    if (absoluteImagePath) {
+                        break;
                     }
                 }
             }
